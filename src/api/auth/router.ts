@@ -49,7 +49,7 @@ async function handleGetProfile(req: Request, res: Response) {
 
 signupRouter.post('/', signUpValidator, handleSignUp);
 loginRouter.post('/', loginValidator, handleLogin);
-userRouter.get('/:id', getProfileValidator, handleGetProfile);
+userRouter.get('/:id', handleGetProfile);
 
 export default loginRouter;
 export { signupRouter, userRouter };

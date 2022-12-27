@@ -14,7 +14,9 @@ export async function createUser(user: User): Promise<any> {
   }
   const saltData = await bcrypt.genSaltSync(config.auth.salt);
   user.password = await bcrypt.hashSync(user.password, saltData);
-  await (await database()).collection('users').insertOne(user);
+  const userID = ObjectId();
+  await (await database()).collection('users').insertOne({ _id: userID, ...user });
+  await (await database()).collection('user-profile').insertOne({ userID: userID, blogs: [] });
   return {
     success: true,
     message: 'User created successfully',
