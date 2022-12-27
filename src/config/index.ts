@@ -8,6 +8,8 @@ export default {
    */
   port: parseInt(process.env.PORT) || 5050,
 
+  salt: parseInt(process.env.SALT) || 10,
+
   /**
    * Database the app should connect to
    */
