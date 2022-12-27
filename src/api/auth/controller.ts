@@ -12,7 +12,7 @@ export async function createUser(user: User): Promise<any> {
   if (userExist) {
     throw new ErrorClass('User already exists', 404);
   }
-  const saltData = await bcrypt.genSaltSync(config.salt);
+  const saltData = await bcrypt.genSaltSync(config.auth.salt);
   user.password = await bcrypt.hashSync(user.password, saltData);
   await (await database()).collection('users').insertOne(user);
   return {

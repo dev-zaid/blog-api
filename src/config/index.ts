@@ -8,8 +8,6 @@ export default {
    */
   port: parseInt(process.env.PORT) || 5050,
 
-  salt: parseInt(process.env.SALT) || 10,
-
   /**
    * Database the app should connect to
    */
@@ -18,7 +16,10 @@ export default {
   /**
    * The secret sauce to validate JWT
    */
-  jwtSecret: process.env.JWT_SECRET,
+  auth: {
+    jwtSecret: process.env.JWT_SECRET,
+    salt: parseInt(process.env.SALT) || 10,
+  },
 
   /**
    * Used by Winston logger
