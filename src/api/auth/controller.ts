@@ -40,7 +40,7 @@ export async function loginUserByEmail(email: string, password: string): Promise
 }
 
 export async function getProfile(id: string): Promise<User> {
-  const user = await (await database()).collection('users').findOne({ _id: new ObjectId(id) });
+  const user = await (await database()).collection('user-profile').findOne({ userID: new ObjectId(id) });
   if (!user) {
     throw {
       message: 'User does not exist',
