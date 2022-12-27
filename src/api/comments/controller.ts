@@ -29,7 +29,12 @@ export async function getAllComments(postID: string): Promise<any> {
 
 export async function getCommentByID(userID: string): Promise<any> {
   try {
-    const comments = await (await database()).collection('comments').find({ user: userID }).toArray();
+    const comments = await (
+      await database()
+    )
+      .collection('comments')
+      .find({ user: new ObjectID(userID) })
+      .toArray();
     if (!comments) throw new ErrorClass('No Comment found', 404);
 
     return {
@@ -58,7 +63,7 @@ export async function postComment(postID: string, comment: string, userID: strin
       user: new ObjectID(userID),
       createdAt: new Date(),
     };
-    await (await database()).collection('comments').insertOne({ commentBody });
+    await (await database()).collection('comments').insertOne(commentBody);
 
     return {
       bool: true,
@@ -78,6 +83,7 @@ export async function postComment(postID: string, comment: string, userID: strin
 export const updateComment = async (commentContent: any, commentID: any, userID: string): Promise<any> => {
   try {
     const user = (await (await database()).collection('comments').findOne({ _id: new ObjectID(commentID) })).user;
+    if (!user) throw new ErrorClass('Comment not found', 404);
     if (userID != user) throw new ErrorClass('Unauthorized', 401);
     await (await database()).collection('comments').updateOne(
       { _id: new ObjectID(commentID) },
@@ -105,8 +111,9 @@ export const updateComment = async (commentContent: any, commentID: any, userID:
 
 export async function deleteComment(commentID: string, userID: string): Promise<any> {
   try {
-    const user = (await (await database()).collection('posts').findOne({ _id: new ObjectID(commentID) })).user;
-    if (userID != user) throw new ErrorClass('Unauthorized', 401);
+    const user = (await (await database()).collection('comments').findOne({ _id: new ObjectID(commentID) })).user;
+    if (!user) throw new ErrorClass('Comment not found', 404);
+    if (userID != user) throw new ErrorClass('This comment was created by another user hence cannot be deleted', 401);
     await (await database()).collection('comments').deleteOne({ _id: new ObjectID(commentID) });
     return {
       bool: true,

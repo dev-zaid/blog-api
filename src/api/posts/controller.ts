@@ -4,8 +4,29 @@ import LoggerInstance from '../../loaders/logger';
 import { Blog } from './model';
 import ErrorClass from '../../shared/types/error';
 
+export async function getBlogByID(postID: string): Promise<any> {
+  try {
+    const blog = await (await database()).collection('posts').findOne({ postID: postID });
+    if (!blog) throw new ErrorClass('Blog not found', 404);
+    return {
+      bool: true,
+      message: 'Success',
+      status: 200,
+      data: blog,
+    };
+  } catch (e) {
+    LoggerInstance.error(e);
+    throw {
+      bool: false,
+      message: 'Error fetching the blog.',
+      status: 400,
+    };
+  }
+}
+
 export async function postBlog(blogpost: Blog, id: string): Promise<any> {
   try {
+    const postID = new ObjectID();
     blogpost = {
       ...blogpost,
       author: new ObjectID(id),
@@ -13,7 +34,10 @@ export async function postBlog(blogpost: Blog, id: string): Promise<any> {
       likes: [],
       comments: [],
     };
-    await (await database()).collection('posts').insertOne(blogpost);
+    await (await database()).collection('posts').insertOne({ _id: postID, ...blogpost });
+    await (await database())
+      .collection('user-profile')
+      .updateOne({ userID: new ObjectID(id) }, { $push: { blogs: postID } });
     return {
       bool: true,
       message: 'Blog posted successfully.',

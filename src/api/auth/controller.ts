@@ -47,7 +47,5 @@ export async function getProfile(id: string): Promise<User> {
       status: 404,
     };
   }
-  delete user.email;
-  delete user.password;
   return user;
 }
