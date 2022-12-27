@@ -1,15 +1,14 @@
 import database from '../../loaders/database';
-import { ObjectId, Timestamp } from 'mongodb';
+import { ObjectID } from 'mongodb';
 import LoggerInstance from '../../loaders/logger';
 import { Blog } from './model';
 import ErrorClass from '../../shared/types/error';
 
 export async function postBlog(blogpost: Blog, id: string): Promise<any> {
   try {
-    console.log(Date.now());
     blogpost = {
       ...blogpost,
-      author: id,
+      author: new ObjectID(id),
       createdAt: new Date(),
       likes: [],
       comments: [],
@@ -32,10 +31,10 @@ export async function postBlog(blogpost: Blog, id: string): Promise<any> {
 
 export const updatePost = async (postID: string, postContent: any, userID: string): Promise<any> => {
   try {
-    const author = (await (await database()).collection('posts').findOne({ _id: new ObjectId(postID) })).author;
+    const author = (await (await database()).collection('posts').findOne({ _id: new ObjectID(postID) })).author;
     if (userID != author) throw new ErrorClass('Unauthorized', 401);
     await (await database()).collection('posts').updateOne(
-      { _id: new ObjectId(postID) },
+      { _id: new ObjectID(postID) },
       {
         $currentDate: {
           lastModified: true,
@@ -58,11 +57,11 @@ export const updatePost = async (postID: string, postContent: any, userID: strin
   }
 };
 
-async function deletePost(postID: string, userID: string): Promise<any> {
+export async function deletePost(postID: string, userID: string): Promise<any> {
   try {
-    const author = (await (await database()).collection('posts').findOne({ _id: new ObjectId(postID) })).author;
+    const author = (await (await database()).collection('posts').findOne({ _id: new ObjectID(postID) })).author;
     if (userID != author) throw new ErrorClass('Unauthorized', 401);
-    await (await database()).collection('posts').deleteOne({ _id: new ObjectId(postID) });
+    await (await database()).collection('posts').deleteOne({ _id: new ObjectID(postID) });
     return {
       bool: true,
       message: 'Blog deleted successfully.',

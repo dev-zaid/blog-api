@@ -11,7 +11,7 @@ const blogPostRouter = Router();
 
 async function handleBlogPost(req: Request, res: Response) {
   try {
-    const postBlogStatus = await postBlog(req.body, res.locals.user);
+    const postBlogStatus = await postBlog(req.body, res.locals.user.id);
     res.status(200).json({
       message: postBlogStatus.message,
     });
@@ -25,7 +25,7 @@ async function handleBlogPost(req: Request, res: Response) {
 
 async function handleUpdatePost(req: Request, res: Response) {
   try {
-    const updatePostStatus = await updatePost(req.params.id, req.body, res.locals.user);
+    const updatePostStatus = await updatePost(req.params.id, req.body, res.locals.user.id);
     res.status(200).json({
       message: updatePostStatus.message,
     });
@@ -39,7 +39,7 @@ async function handleUpdatePost(req: Request, res: Response) {
 
 async function handleDeletePost(req: Request, res: Response) {
   try {
-    const deletePostStatus = await deletePost(req.params.id, res.locals.user);
+    const deletePostStatus = await deletePost(req.params.id, res.locals.user.id);
     res.status(200).json({
       message: deletePostStatus.message,
     });

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import config from '../../config';
+import { verifyToken } from '../helper/token';
 import ErrorClass from '../types/error';
 
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
@@ -16,8 +17,8 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       next(new ErrorClass('Invalid Token Format', 401));
     }
     const token = tokenHeader[1];
-    verify(token, config.auth.jwtSecret);
-    res.locals.user = token;
+    const id = await verifyToken(token);
+    res.locals.user = { token: token, id: id.id };
     next();
   } catch (error: any) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
