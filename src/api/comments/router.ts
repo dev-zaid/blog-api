@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import LoggerInstance from '../../loaders/logger';
-import { getAllComments, getCommentByID, postComment, updateComment } from './controller';
+import { deleteComment, getAllComments, getCommentByID, postComment, updateComment } from './controller';
 import authenticate from '../../shared/middleware/authentication';
 
 const commentRouter = Router();
@@ -65,9 +65,24 @@ async function handleUpdateComment(req: Request, res: Response) {
   }
 }
 
+async function handleDeletePost(req: Request, res: Response) {
+  try {
+    const deletePostStatus = await deleteComment(req.params.id, res.locals.user.id);
+    res.status(200).json({
+      message: deletePostStatus.message,
+    });
+  } catch (e) {
+    LoggerInstance.error(e);
+    res.status(e.status || 500).json({
+      message: e.message || "Post couldn't be deleted",
+    });
+  }
+}
+
 commentRouter.get('/', handleGetAllComments);
 commentRouter.get('/:id', handleCommentByID);
 commentRouter.post('/', authenticate, handlePostComment);
-commentRouter.post('/:id', authenticate, handleUpdateComment);
+commentRouter.put('/:id', authenticate, handleUpdateComment);
+commentRouter.delete('/:id', authenticate, handleDeletePost);
 
 export default commentRouter;

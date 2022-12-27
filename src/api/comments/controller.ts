@@ -102,3 +102,23 @@ export const updateComment = async (commentContent: any, commentID: any, userID:
     };
   }
 };
+
+export async function deleteComment(commentID: string, userID: string): Promise<any> {
+  try {
+    const user = (await (await database()).collection('posts').findOne({ _id: new ObjectID(commentID) })).user;
+    if (userID != user) throw new ErrorClass('Unauthorized', 401);
+    await (await database()).collection('comments').deleteOne({ _id: new ObjectID(commentID) });
+    return {
+      bool: true,
+      message: 'Comment deleted successfully.',
+      status: 200,
+    };
+  } catch (e) {
+    LoggerInstance.error(e);
+    throw {
+      bool: false,
+      message: 'Error deleting the comment.',
+      status: 400,
+    };
+  }
+}
